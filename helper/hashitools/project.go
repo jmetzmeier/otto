@@ -3,10 +3,12 @@ package hashitools
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"log"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/hashicorp/go-checkpoint"
 	"github.com/hashicorp/go-version"
@@ -67,7 +69,7 @@ func (p *Project) InstallIfNeeded() error {
 	select {
 	case latest = <-latestCh:
 	case err := <-errCh:
-		return err
+		log.Printf("[ERROR] error checking latest version: %s", err)
 	}
 	log.Printf("[DEBUG] installIfNeeded: %s latest: %s", p.Name, latest)
 	log.Printf("[DEBUG] installIfNeeded: %s min: %s", p.Name, p.MinVersion)
@@ -130,14 +132,15 @@ func (p *Project) Version() (*version.Version, error) {
 	}
 
 	// Grab the version
-	var buf bytes.Buffer
+	var stdout, buf bytes.Buffer
 	cmd := exec.Command(path, "--version")
-	cmd.Stdout = &buf
+	cmd.Stdout = io.MultiWriter(&stdout, &buf)
+	cmd.Stderr = &buf
 	runErr := cmd.Run()
 
 	// Match the version out before we check for a run error, since some `project
 	// --version` commands can return a non-zero exit code.
-	matches := versionRe.FindStringSubmatch(buf.String())
+	matches := versionRe.FindStringSubmatch(stdout.String())
 	if len(matches) == 0 {
 		if runErr != nil {
 			return nil, fmt.Errorf(
@@ -147,6 +150,11 @@ func (p *Project) Version() (*version.Version, error) {
 		return nil, fmt.Errorf(
 			"unable to find %s version in output: %q", p.Name, buf.String())
 	}
+
+	// This is a weird quirk: our version lib follows semver strictly
+	// but Vagrant in particular uses ".dev" instead "-dev" to end the
+	// version for Rubygems. Fix that up with duct tape.
+	matches[1] = strings.Replace(matches[1], ".dev", "-dev", 1)
 
 	return version.NewVersion(matches[1])
 }

@@ -12,7 +12,7 @@ Application dependencies are a first class feature in Otto.
 
 Modern applications often depend on many components. With the ever-growing
 ["microservices"](http://martinfowler.com/articles/microservices.html) trend,
-is isn't abnormal for an application to depend on dozens of other applications.
+it isn't abnormal for an application to depend on dozens of other applications.
 A common difficulty with microservices is development environments and
 orchestrating deploys. Otto solves both of these problems.
 
@@ -47,7 +47,7 @@ application {
 ```
 
 The "source" string can be local path, HTTP URL, Git URL, and many more.
-The full reference so dependency sources can be seen in the
+The full reference to dependency sources can be seen in the
 [dependency sources](/docs/appfile/dep-sources.html)
 page.
 

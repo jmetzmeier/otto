@@ -7,6 +7,9 @@
 						<li class="li-under"><a href="/docs/index.html">Docs</a></li>
 						<li class="li-under"><a href="/community.html">Community</a></li>
 						<li class="li-under"><a href="/security.html">Security</a></li>
+						<% if current_page.url != '/' %>
+							<li class="li-under"><a href="<%= github_url :current_page %>">Edit this page</a></li>
+						<% end %>
 					</ul>
 				</div>
 				<div class="footer-hashi col-sm-6 col-xs-12">
@@ -26,7 +29,7 @@
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-62364009-1', 'auto');
+  ga('create', 'UA-68492626-1', 'auto');
   ga('send', 'pageview');
 </script>
 
